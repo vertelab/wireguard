@@ -1,27 +1,48 @@
 #! /bin/bash
 
+WG_PATH=/etc/wireguard
+WG_CONF="$WG_PATH"/wg0.conf
+KEYS_PATH="$WG_PATH"/keys
+
 sudo apt install wireguard
 
-sudo mkdir /etc/wireguard/keys
-sudo chmod 700 /etc/wireguard/keys
+sudo mkdir "$KEYS_PATH"
+sudo chmod 700 "$KEYS_PATH"
 
 echo creating private key...
 PRIV_KEY=$(sudo wg genkey)
-echo "$PRIV_KEY" | sudo tee /etc/wireguard/keys/private >/dev/null
-sudo chown 600 /etc/wireguard/keys/private
+echo "$PRIV_KEY" | sudo tee "$KEYS_PATH"/private >/dev/null
+sudo chmod 600 "$KEYS_PATH"/private
 
 echo creating public key...
 PUB_KEY=$(echo "$PRIV_KEY" | sudo wg pubkey)
-echo "$PUB_KEY" | sudo tee /etc/wireguard/keys/pubkey >/dev/null
+echo "$PUB_KEY" | tee "/tmp/pubkey" >/dev/null
+sudo cp "/tmp/pubkey" "$KEYS_PATH"/pubkey
 
-sudo tee /etc/wireguard/wg0.conf >/dev/null <<'EOF'
+scp /tmp/pubkey "$USER"@gw1.vertel.se:/tmp/pubkey 
+
+if ssh "$USER@gw1.vertel.se" "command -v wg_client_helper >/dev/null 2>&1"; then
+  ssh -t "sudo wget -O /usr/local/bin/wg_client_helper" https://github.com/vertelab/wireguard/raw/refs/heads/main/wg_client_helper.sh
+fi
+
+ssh -t "$USER"@gw1.vertel.se "wg_client_helper"
+scp "$USER"@gw1.vertel.se:/tmp/serv_pub_ip /tmp/serv_pub_ip
+readarray -t SERVPUB_AND_IP < /tmp/serv_pub_ip
+
+WG1_PUB_KEY=${SERVPUB_AND_IP[0]}
+IP=${SERVPUB_AND_IP[1]}
+
+sudo tee "$WG_CONF" >/dev/null <<'EOF'
 [Interface]
-Address = 172.16.11.3/24
-PrivateKey = <private>
+Address = $IP/24
+PrivateKey = $PRIV_KEY
 
 [Peer]
-PublicKey = <public>
+PublicKey = $WG1_PUB_KEY
 Endpoint = 135.181.32.1:51820
-AllowedIPs = 172.16.11.0/29, 192.168.11.0/24
+AllowedIPs = 172.16.11.0/24, 192.168.12.0/24, 192.168.11.0/24
 PersistentKeepalive = 25
 EOF
+
+sudo wg-quick down wg0
+sudo wg-quick up wg0
