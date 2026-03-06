@@ -27,7 +27,7 @@ fi
 
 ssh -t "$USER"@gw1.vertel.se "wg_client_helper"
 SERVPUB_AND_IP=$(ssh "$USER"@gw1.vertel.se "cat /tmp/serv_pub_ip")
-ssh "$USER"@gw1.vertel.se "rm -f /tmp/serv_pub_ip"
+ssh -t "$USER"@gw1.vertel.se "sudo rm /tmp/serv_pub_ip"
 read -ra SERVPUB_AND_IP <<< "$SERVPUB_AND_IP"
 
 WG1_PUB_KEY=${SERVPUB_AND_IP[0]}
