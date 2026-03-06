@@ -1,6 +1,8 @@
 #!/bin/bash
 
 BASE="172.16.11"
+WG_PATH=/etc/wireguard
+WG_CONF="$WG_PATH"/wg0.conf
 
 for i in {1..254}; do
     if ! ping -c 2 -W 2 "$BASE.$i" > /dev/null 2>&1; then
