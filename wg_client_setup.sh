@@ -32,7 +32,7 @@ readarray -t SERVPUB_AND_IP < /tmp/serv_pub_ip
 WG1_PUB_KEY=${SERVPUB_AND_IP[0]}
 IP=${SERVPUB_AND_IP[1]}
 
-sudo tee "$WG_CONF" >/dev/null <<'EOF'
+sudo tee "$WG_CONF" >/dev/null <<EOF
 [Interface]
 Address = $IP/24
 PrivateKey = $PRIV_KEY
