@@ -26,8 +26,9 @@ if ! ssh "$USER@gw1.vertel.se" "command -v wg_client_helper >/dev/null 2>&1"; th
 fi
 
 ssh -t "$USER"@gw1.vertel.se "wg_client_helper"
-scp "$USER"@gw1.vertel.se:/tmp/serv_pub_ip /tmp/serv_pub_ip
-readarray -t SERVPUB_AND_IP < /tmp/serv_pub_ip
+SERVPUB_AND_IP=$(ssh "$USER"@gw1.vertel.se "cat /tmp/serv_pub_ip")
+ssh "$USER"@gw1.vertel.se "rm -f /tmp/serv_pub_ip"
+read -ra SERVPUB_AND_IP <<< "$SERVPUB_AND_IP"
 
 WG1_PUB_KEY=${SERVPUB_AND_IP[0]}
 IP=${SERVPUB_AND_IP[1]}

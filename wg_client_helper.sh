@@ -26,6 +26,7 @@ fi
 
 SERVER_PUB_KEY=$(sudo cat /etc/wireguard/keys/pubkey)
 CLIENT_PUB_KEY=$(cat /tmp/pubkey)
+rm -f /tmp/pubkey
 
 sudo tee -a "$WG_CONF" >/dev/null <<EOF
 
