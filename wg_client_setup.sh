@@ -1,7 +1,7 @@
 #! /bin/bash
 
 WG_PATH=/etc/wireguard
-WG_CONF="$WG_PATH"/wg0.conf
+WG_CONF="$WG_PATH"/wg1.conf
 KEYS_PATH="$WG_PATH"/keys
 
 sudo apt install wireguard
@@ -45,5 +45,5 @@ AllowedIPs = 172.16.11.0/24, 192.168.12.0/24, 192.168.11.0/24
 PersistentKeepalive = 25
 EOF
 
-sudo wg-quick down wg0
+sudo wg-quick down wg1
 sudo wg-quick up wg0
