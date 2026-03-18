@@ -16,6 +16,7 @@ sudo nmcli connection up wg1
 
 You will now be able to toggle the VPN on/off in the network settings.
 
+
 ### Same as above but for servers.
 ```
 sudo systemctl enable wg-quick@wg1
