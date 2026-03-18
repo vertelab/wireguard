@@ -46,4 +46,4 @@ PersistentKeepalive = 25
 EOF
 
 sudo wg-quick down wg1
-sudo wg-quick up wg0
+sudo wg-quick up wg1
