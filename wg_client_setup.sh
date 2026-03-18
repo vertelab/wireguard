@@ -45,5 +45,30 @@ AllowedIPs = 172.16.11.0/24, 192.168.12.0/24, 192.168.11.0/24
 PersistentKeepalive = 25
 EOF
 
-sudo systemctl enable wg-quick@wg1
-sudo systemctl start wg-quick@wg1
+is_desktop() {
+    # Check desktop package
+    dpkg -l ubuntu-desktop >/dev/null 2>&1 && return 0
+    
+    # Check GUI session
+    [ "$XDG_SESSION_TYPE" = "x11" ] || [ "$XDG_SESSION_TYPE" = "wayland" ] && return 0
+    
+    # Check graphical target
+    systemctl -q is-active graphical.target && return 0
+    
+    # Check display manager
+    pgrep -x "gdm3" >/dev/null 2>&1 || pgrep -x "gdm" >/dev/null 2>&1 && return 0
+    
+    return 1
+}
+
+if is_desktop; then
+    echo "DESKTOP - configure NetworkManager VPN"
+    sudo nmcli connection import type wireguard file /etc/wireguard/wg1.conf
+    sudo nmcli connection up wg1
+else
+    echo "SERVER - configure systemd service"
+    sudo systemctl enable wg-quick@wg1
+    sudo systemctl start wg-quick@wg1
+fi
+
+
