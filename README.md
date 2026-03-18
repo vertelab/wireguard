@@ -7,7 +7,7 @@ curl -fsSL https://raw.githubusercontent.com/vertelab/wireguard/refs/heads/main/
 ```
 
 ### If you installed the script on a desktop client before it had code for persistence.
-### Run the code belowe.
+### Run the code below.
 ```
 sudo nmcli connection import type wireguard file /etc/wireguard/wg1.conf
 sudo nmcli connection up wg1
