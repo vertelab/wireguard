@@ -45,5 +45,5 @@ AllowedIPs = 172.16.11.0/24, 192.168.12.0/24, 192.168.11.0/24
 PersistentKeepalive = 25
 EOF
 
-sudo wg-quick down wg1
-sudo wg-quick up wg1
+sudo systemctl enable wg-quick@wg1
+sudo systemctl start wg-quick@wg1
