@@ -62,11 +62,11 @@ is_desktop() {
 }
 
 if is_desktop; then
-    echo "DESKTOP - configure NetworkManager VPN"
+    echo "DESKTOP detected: adding wg1 to GNOME NetworkManager"
     sudo nmcli connection import type wireguard file /etc/wireguard/wg1.conf
     sudo nmcli connection up wg1
 else
-    echo "SERVER - configure systemd service"
+    echo "SERVER deteted: adding wg1 as a service"
     sudo systemctl enable wg-quick@wg1
     sudo systemctl start wg-quick@wg1
 fi
