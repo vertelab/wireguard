@@ -3,7 +3,7 @@
 ## Install
 
 ```
-curl -fsSL https://raw.githubusercontent.com/vertelab/wireguard/refs/heads/main/wg_client_setup.sh | sudo bash
+bash <(curl -sSL https://raw.githubusercontent.com/vertelab/wireguard/refs/heads/main/wg_client_setup.sh) -u [username to ssh as]
 ```
 
 ### If you installed the script on a desktop client before it had code for persistence.
