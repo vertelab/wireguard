@@ -1,5 +1,26 @@
 #! /bin/bash
 
+set -u
+
+usage() {
+    echo "Usage: $0 [-u <username>]" 1>&2
+    echo "  -u: Username on fd.vertel.se (defaults to \$USER)"
+    exit 1
+}
+
+OPTIONS=$(getopt -o u: -- "$@") || usage
+eval set -- "$OPTIONS"
+
+USERNAME="$USER"  # Default to current user
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -u) USERNAME="$2"; shift 2 ;;
+        --) shift; break ;;
+        *) usage ;;
+    esac
+done
+
 WG_PATH=/etc/wireguard
 WG_CONF="$WG_PATH"/wg1.conf
 KEYS_PATH="$WG_PATH"/keys
@@ -19,15 +40,15 @@ PUB_KEY=$(echo "$PRIV_KEY" | sudo wg pubkey)
 echo "$PUB_KEY" | tee "/tmp/pubkey" >/dev/null
 sudo cp "/tmp/pubkey" "$KEYS_PATH"/pubkey
 
-scp /tmp/pubkey "$USER"@gw1.vertel.se:/tmp/pubkey 
+scp /tmp/pubkey "$USERNAME"@gw1.vertel.se:/tmp/pubkey 
 
-if ! ssh "$USER@gw1.vertel.se" "command -v wg_client_helper >/dev/null 2>&1"; then
-  ssh -t "$USER@gw1.vertel.se" "wget -O ~/wg_client_helper https://github.com/vertelab/wireguard/raw/refs/heads/main/wg_client_helper.sh && chmod +x ~/wg_client_helper && sudo mv ~/wg_client_helper /usr/local/bin/"
+if ! ssh "$USERNAME@gw1.vertel.se" "command -v wg_client_helper >/dev/null 2>&1"; then
+  ssh -t "$USERNAME@gw1.vertel.se" "wget -O ~/wg_client_helper https://github.com/vertelab/wireguard/raw/refs/heads/main/wg_client_helper.sh && chmod +x ~/wg_client_helper && sudo mv ~/wg_client_helper /usr/local/bin/"
 fi
 
-ssh -t "$USER"@gw1.vertel.se "wg_client_helper"
-SERVPUB_AND_IP=$(ssh "$USER"@gw1.vertel.se "cat /tmp/serv_pub_ip")
-ssh -t "$USER"@gw1.vertel.se "sudo rm /tmp/serv_pub_ip"
+ssh -t "$USERNAME"@gw1.vertel.se "wg_client_helper"
+SERVPUB_AND_IP=$(ssh "$USERNAME"@gw1.vertel.se "cat /tmp/serv_pub_ip")
+ssh -t "$USERNAME"@gw1.vertel.se "sudo rm /tmp/serv_pub_ip"
 readarray -t SERVPUB_AND_IP <<< "$SERVPUB_AND_IP"
 
 WG1_PUB_KEY=${SERVPUB_AND_IP[0]}
