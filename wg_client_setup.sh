@@ -73,9 +73,6 @@ is_desktop() {
     # Check GUI session
     [ "$XDG_SESSION_TYPE" = "x11" ] || [ "$XDG_SESSION_TYPE" = "wayland" ] && return 0
     
-    # Check graphical target
-    systemctl -q is-active graphical.target && return 0
-    
     # Check display manager
     pgrep -x "gdm3" >/dev/null 2>&1 || pgrep -x "gdm" >/dev/null 2>&1 && return 0
     
